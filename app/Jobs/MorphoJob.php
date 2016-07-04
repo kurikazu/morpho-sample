@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use \Curl\Curl;
+
 class MorphoJob extends Job
 {
     protected $filename;
@@ -24,7 +26,22 @@ class MorphoJob extends Job
      */
     public function handle()
     {
+/*
         //
-        echo $this->filename;
+        $file = new \SplFileObject($this->filename);
+        $file->setFlags(\SplFileObject::READ_CSV);
+        foreach ($file as $line) {
+            $tmp = implode(",",$line);
+        }
+        $file = null;
+*/
+        //
+        $curl = new Curl();
+        $curl->setOpt(CURLOPT_HTTPGET, true);
+        $curl->get(env('MORPHO'), array(
+            'd' => 'こんにちは、世界',
+        ));
+        dd($curl->response);
+//json_decode($curl->response, true)
     }
 }
