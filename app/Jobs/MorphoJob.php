@@ -39,7 +39,7 @@ class MorphoJob extends Job
         }
         $file = null;
 */
-        dd($this->analyze_word('こんにちは、世界'));
+        dd(json_decode($this->analyze_word('こんにちは、世界')));
 /*
         //
         $curl = new Curl();
@@ -57,12 +57,15 @@ class MorphoJob extends Job
     /**
      * リクエスト用のオプションを設定
      */
-    protected function create_options($url, $body)
+    protected function create_options($body)
     {
-$header = [
-    'Content-Type: application/json',
-];
-
+        $url = env('MORPHO') . http_build_query(array(
+          'analyzer' => 'kuromoji',
+          'pretty'   => true,
+        ));
+        $header = [
+            'Content-Type: application/json',
+        ];
 
         return array(
             CURLOPT_URL            => $url,
@@ -72,17 +75,6 @@ $header = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => true,
         );
-    }
-
-    /**
-     * リクエストURLを生成
-     */
-    protected function create_request_url()
-    {
-        return env('MORPHO') . http_build_query(array(
-            'analyzer' => 'kuromoji', // 形態素解析にkuromojiプラグインを利用する
-            'pretty'   => true,
-        ));
     }
 
     /**
@@ -109,6 +101,6 @@ $header = [
      */
     public function analyze_word($text)
     {
-        return $this->request($this->create_options($this->create_request_url(), $text));
+        return $this->request($this->create_options($text));
     }
 }
