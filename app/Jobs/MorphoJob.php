@@ -37,9 +37,11 @@ class MorphoJob extends Job
 */
         //
         $curl = new Curl();
-        $curl->setOpt(CURLOPT_HTTPGET, true);
+        $curl->setOpt(CURLOPT_POST, true);
+        $curl->setOpt(CURLOPT_POSTFIELDS, 'こんにちは、世界');
         $curl->get(env('MORPHO'), array(
-            'd' => 'こんにちは、世界',
+            'analyzer' => 'kuromoji',
+            'pretty' => true,
         ));
         dd($curl->response);
 //json_decode($curl->response, true)
