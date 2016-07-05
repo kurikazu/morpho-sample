@@ -7,6 +7,10 @@ use \Curl\Curl;
 class MorphoJob extends Job
 {
     protected $filename;
+    /** 接続先のElasticSearchのURL & ポート */
+    const BASE_URL = 'localhost';
+    const PORT     = '9200';
+
 
     /**
      * Create a new job instance.
@@ -35,6 +39,8 @@ class MorphoJob extends Job
         }
         $file = null;
 */
+        $this->analyze_word('こんにちは、世界');
+/*
         //
         $curl = new Curl();
         $curl->setOpt(CURLOPT_POST, true);
@@ -45,5 +51,58 @@ class MorphoJob extends Job
         ));
         dd($curl->response);
 //json_decode($curl->response, true)
+*/
+    }
+
+    /**
+     * リクエスト用のオプションを設定
+     */
+    protected function create_options($url, $body)
+    {
+        return array(
+            CURLOPT_URL            => $url,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $body,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => true,
+        );
+    }
+
+    /**
+     * リクエストURLを生成
+     */
+    protected function create_request_url()
+    {
+        return env('MORPHO').'?'.http_build_query(array(
+            'analyzer' => 'kuromoji', // 形態素解析にkuromojiプラグインを利用する
+            'pretty'   => true,
+        ));
+    }
+
+    /**
+     * リクエストを実行
+     */
+    protected function request($options)
+    {
+        $ch = curl_init();
+        curl_setopt_array($ch, $options);
+        $result      = curl_exec($ch);
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header      = substr($result, 0, $header_size);
+        $result      = substr($result, $header_size);
+        curl_close($ch);
+
+        return array(
+            'Header' => $header,
+            'Result' => $result,
+        );
+    }
+
+    /**
+     * 指定した文字列を形態素解析し、結果を返却する
+     */
+    public function analyze_word($text)
+    {
+        return $this->request($this->create_options($this->create_request_url(), $text));
     }
 }
