@@ -39,7 +39,7 @@ class MorphoJob extends Job
         }
         $file = null;
 */
-        $this->analyze_word('こんにちは、世界');
+        dd($this->analyze_word('こんにちは、世界'));
 /*
         //
         $curl = new Curl();
@@ -59,10 +59,16 @@ class MorphoJob extends Job
      */
     protected function create_options($url, $body)
     {
+$header = [
+    'Content-Type: application/json',
+];
+
+
         return array(
             CURLOPT_URL            => $url,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $body,
+            CURLOPT_HTTPHEADER     => $header,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => true,
         );
@@ -73,7 +79,7 @@ class MorphoJob extends Job
      */
     protected function create_request_url()
     {
-        return env('MORPHO').'?'.http_build_query(array(
+        return env('MORPHO') . http_build_query(array(
             'analyzer' => 'kuromoji', // 形態素解析にkuromojiプラグインを利用する
             'pretty'   => true,
         ));
