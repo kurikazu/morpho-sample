@@ -30,28 +30,30 @@ class MorphoJob extends Job
      */
     public function handle()
     {
-/*
-        //
-        $file = new \SplFileObject($this->filename);
-        $file->setFlags(\SplFileObject::READ_CSV);
-        foreach ($file as $line) {
-            $tmp = implode(",",$line);
+      //
+      $file = new \SplFileObject($this->filename);
+      $file->setFlags(\SplFileObject::READ_CSV);
+      foreach ($file as $line) {
+          $this->output_file($line);
+      }
+      $file = null;
+    }
+
+    private function output_file($line)
+    {
+        $tmp   = implode(",", $line);
+        $words = $this->analyze_word($tmp);
+        if ( ! array_key_exists('Result', $words)) {
+            return;
         }
-        $file = null;
-*/
-        dd(json_decode($this->analyze_word('こんにちは、世界')));
-/*
-        //
-        $curl = new Curl();
-        $curl->setOpt(CURLOPT_POST, true);
-        $curl->setOpt(CURLOPT_POSTFIELDS, 'こんにちは、世界');
-        $curl->get(env('MORPHO'), array(
-            'analyzer' => 'kuromoji',
-            'pretty' => true,
-        ));
-        dd($curl->response);
-//json_decode($curl->response, true)
-*/
+        $resultary = json_decode($words['Result'], true);
+        if ( ! array_key_exists('tokens', $resultary)) {
+            return;
+        }
+        $strary = $resultary['tokens'];
+        foreach ($strary as $str) {
+            file_put_contents('sample.txt', $str['token']."\r\n", FILE_APPEND);
+        }
     }
 
     /**
