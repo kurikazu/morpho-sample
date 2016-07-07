@@ -37,7 +37,8 @@ class MorphoJob extends Job
       $cnt = 0;
       foreach ($file as $line) {
           $this->output_file($line, $cnt);
-          if($cnt % 100 == 0) echo $cnt . "/" . $line_cnt . " Done.¥r¥n";
+          if($cnt % 100 == 0) echo $cnt . " / " . $line_cnt . " Done." . PHP_EOL;
+          $cnt++;
       }
       $file = null;
     }
