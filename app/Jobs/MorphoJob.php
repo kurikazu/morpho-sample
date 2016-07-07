@@ -33,14 +33,19 @@ class MorphoJob extends Job
       //
       $file = new \SplFileObject($this->filename);
       $file->setFlags(\SplFileObject::READ_CSV);
+      $line_cnt = count($file);
+      $cnt = 0;
       foreach ($file as $line) {
-          $this->output_file($line);
+          $this->output_file($line, $cnt);
+          if($cnt % 100 == 0) echo $cnt . "/" . $line_cnt . " Done.¥r¥n";
       }
       $file = null;
     }
 
-    private function output_file($line)
+    private function output_file($line, $cnt)
     {
+        $outname = "output_".floor ($cnt / 100).".txt";
+
         $tmp   = implode(",", $line);
         $words = $this->analyze_word($tmp);
         if ( ! array_key_exists('Result', $words)) {
@@ -52,7 +57,7 @@ class MorphoJob extends Job
         }
         $strary = $resultary['tokens'];
         foreach ($strary as $str) {
-            file_put_contents('sample.txt', $str['token']."\r\n", FILE_APPEND);
+            file_put_contents($outname, $str['token']."\r\n", FILE_APPEND);
         }
     }
 
